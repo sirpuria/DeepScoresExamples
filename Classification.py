@@ -47,6 +47,7 @@ def create_deepscores_cnn_model(input_shape, nr_classes):
 def main(FLAGS):
     dataset_dir = FLAGS.data_dir
     batch_size=FLAGS.batch_size
+    epochs=FLAGS.epochs
     train_dir = os.path.join(dataset_dir, 'train')
     validation_dir = os.path.join(dataset_dir, 'validate')
     classes= os.listdir(train_dir)
@@ -62,7 +63,7 @@ def main(FLAGS):
     model.compile(optimizer= 'adam', loss=CategoricalCrossentropy(from_logits=True), metrics=['accuracy'])
     model.summary()
 
-    model.fit(train_gn, epochs=1, validation_data=validation_gn)
+    model.fit(train_gn, epochs=epochs, validation_data=validation_gn)
 
 
 if __name__ == '__main__':
@@ -73,7 +74,7 @@ if __name__ == '__main__':
     parser.add_argument('--batch_size', type=int,
                       default=128)
     parser.add_argument('--epochs', type=int,
-                    default=10)
+                    default=50)
 
 
     FLAGS, unparsed = parser.parse_known_args()
