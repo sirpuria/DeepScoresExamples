@@ -46,14 +46,15 @@ def create_deepscores_cnn_model(input_shape, nr_classes):
 
 def main(FLAGS):
     dataset_dir = FLAGS.data_dir
+    batch_size=FLAGS.batch_size
     train_dir = os.path.join(dataset_dir, 'train')
     validation_dir = os.path.join(dataset_dir, 'validate')
     classes= os.listdir(train_dir)
 
     image_generator = ImageDataGenerator(rescale=1/255.)
-    train_gn = image_generator.flow_from_directory(directory=train_dir, batch_size=2, shuffle=True,
+    train_gn = image_generator.flow_from_directory(directory=train_dir, batch_size=batch_size, shuffle=True,
                     target_size=(120, 220), classes=classes)
-    validation_gn = image_generator.flow_from_directory(directory=validation_dir, batch_size=2, shuffle=True,
+    validation_gn = image_generator.flow_from_directory(directory=validation_dir, batch_size=batch_size, shuffle=True,
                     target_size=(120, 220), classes=classes)
 
 
