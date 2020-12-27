@@ -324,7 +324,7 @@ if __name__ == '__main__':
             print("Time for {0} iterations: {1} mins".format(i, (time.time()-t_start)/60.0))
             print("Train Loss: {0}".format(loss))
             val_acc = test_oneshot(model, N_way, n_val, verbose=True)
-            model.save_weights(os.path.join(model_path, 'weights.{}.h5'.format(i)))
+            model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(i)))
             if val_acc >= best:
                 print("Current best: {0}, previous best: {1}".format(val_acc, best))
                 best = val_acc
