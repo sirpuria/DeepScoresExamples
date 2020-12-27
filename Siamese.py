@@ -73,35 +73,6 @@ def loadimgs(path,n = 0):
 
 
 
-def create_deepscores_cnn_model(input_shape, nr_classes):
-    left_input = Input(input_shape)
-    right_input = Input(input_shape)
-    model = Sequential([
-    #input
-    Conv2D(32, (3,3), activation='relu', padding="same", strides=(1, 1), use_bias=True,  bias_initializer='zeros', input_shape=input_shape),
-    MaxPool2D((2,2), padding="same"),
-    Dropout(0.1),
-    Conv2D(64, (3,3), activation='relu', padding="same", strides=(1, 1), use_bias=True,  bias_initializer='zeros'),
-    MaxPool2D((2,2), padding="same"),
-    Dropout(0.1),
-    Conv2D(128, (3,3), activation='relu', padding="same", strides=(1, 1), use_bias=True,  bias_initializer='zeros'),
-    MaxPool2D((2,2), padding="same"),
-    Dropout(0.1),
-    Conv2D(256, (3,3), activation='relu', padding="same", strides=(1, 1), use_bias=True,  bias_initializer='zeros'),
-    MaxPool2D((2,2), padding="same"),
-    Dropout(0.1),
-    Conv2D(512, (3,3), activation='relu', padding="same", strides=(1, 1), use_bias=True,  bias_initializer='zeros'),
-    MaxPool2D((2,2), padding="same"),
-    Dropout(0.1),
-    Flatten(),
-    Dense(1024),
-    #Dense(nr_classes)
-    ])
-
-
-
-    return model
-
 # def initialize_weights(shape, name=None):
 #     """
 #         The paper, http://www.cs.utoronto.ca/~gkoch/files/msc-thesis.pdf
@@ -129,9 +100,6 @@ def get_siamese_model(input_shape):
     initialize_bias = tf.keras.initializers.RandomNormal(mean=0.5, stddev=0.01)
     # Convolutional Neural Network
     model = Sequential([
-    Conv2D(32, (10,10), activation='relu', input_shape=input_shape,
-                   kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
-    MaxPool2D(),
     Conv2D(64, (10,10), activation='relu', input_shape=input_shape,
                    kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
     MaxPool2D(),
@@ -143,9 +111,6 @@ def get_siamese_model(input_shape):
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
     MaxPool2D(),
     Conv2D(256, (4,4), activation='relu', kernel_initializer=initialize_weights,
-                     bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
-    MaxPool2D(),
-    Conv2D(512, (4,4), activation='relu', kernel_initializer=initialize_weights,
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
     Flatten(),
     Dense(4096, activation='sigmoid',
@@ -181,12 +146,11 @@ def get_batch(batch_size,s="train"):
         categories = val_classes
     n_classes, n_examples, h, w = X.shape
 
-
     # randomly sample several classes to use in the batch
     categories = rng.choice(n_classes,size=(batch_size,),replace=False)
 
     # initialize 2 empty arrays for the input image batch
-    pairs=[np.zeros((batch_size, w, h,1)) for i in range(2)]
+    pairs=[np.zeros((batch_size, h, w,1)) for i in range(2)]
 
     # initialize vector for the targets
     targets=np.zeros((batch_size,))
@@ -196,7 +160,7 @@ def get_batch(batch_size,s="train"):
     for i in range(batch_size):
         category = categories[i]
         idx_1 = rng.randint(0, n_examples)
-        pairs[0][i,:,:,:] = X[category, idx_1].reshape(w, h, 1)
+        pairs[0][i,:,:,:] = X[category, idx_1].reshape(h, w, 1)
         idx_2 = rng.randint(0, n_examples)
 
         # pick images of same class for 1st half, different for 2nd
@@ -206,9 +170,10 @@ def get_batch(batch_size,s="train"):
             # add a random number to the category modulo n classes to ensure 2nd image has a different category
             category_2 = (category + rng.randint(1,n_classes)) % n_classes
 
-        pairs[1][i,:,:,:] = X[category_2,idx_2].reshape(w, h,1)
+        pairs[1][i,:,:,:] = X[category_2,idx_2].reshape(h, w,1)
 
     return pairs, targets
+
 
 def generate(batch_size, s="train"):
     """a generator for batches, so model.fit_generator can be used. """
@@ -224,7 +189,7 @@ def make_oneshot_task(N, s="val", language=None):
     else:
         X = Xval
         categories = val_classes
-    n_classes, n_examples, h, w = X.shape
+    n_classes, n_examples,h, w = X.shape
 
     indices = rng.randint(0, n_examples,size=(N,))
     if language is not None: # if language is specified, select characters for that language
@@ -237,16 +202,17 @@ def make_oneshot_task(N, s="val", language=None):
         categories = rng.choice(range(n_classes),size=(N,),replace=False)
     true_category = categories[0]
     ex1, ex2 = rng.choice(n_examples,replace=False,size=(2,))
-    test_image = np.asarray([X[true_category,ex1,:,:]]*N).reshape(N, w, h,1)
+    test_image = np.asarray([X[true_category,ex1,:,:]]*N).reshape(N, h,w,1)
     support_set = X[categories,indices,:,:]
     support_set[0,:,:] = X[true_category,ex2]
-    support_set = support_set.reshape(N, w, h,1)
+    support_set = support_set.reshape(N, h, w,1)
     targets = np.zeros((N,))
     targets[0] = 1
     targets, test_image, support_set = shuffle(targets, test_image, support_set)
     pairs = [test_image,support_set]
 
     return pairs, targets
+
 
 
 def test_oneshot(model, N, k, s = "val", verbose = 0):
