@@ -173,13 +173,14 @@ def get_batch(batch_size,s="train"):
     else:
         X = Xval
         categories = val_classes
-    n_classes, n_examples, w, h = X.shape
+    n_classes, n_examples, h, w = X.shape
+
 
     # randomly sample several classes to use in the batch
     categories = rng.choice(n_classes,size=(batch_size,),replace=False)
 
     # initialize 2 empty arrays for the input image batch
-    pairs=[np.zeros((batch_size, h, w,1)) for i in range(2)]
+    pairs=[np.zeros((batch_size, w, h,1)) for i in range(2)]
 
     # initialize vector for the targets
     targets=np.zeros((batch_size,))
@@ -189,7 +190,7 @@ def get_batch(batch_size,s="train"):
     for i in range(batch_size):
         category = categories[i]
         idx_1 = rng.randint(0, n_examples)
-        pairs[0][i,:,:,:] = X[category, idx_1].reshape(h, w, 1)
+        pairs[0][i,:,:,:] = X[category, idx_1].reshape(w, h, 1)
         idx_2 = rng.randint(0, n_examples)
 
         # pick images of same class for 1st half, different for 2nd
@@ -199,7 +200,7 @@ def get_batch(batch_size,s="train"):
             # add a random number to the category modulo n classes to ensure 2nd image has a different category
             category_2 = (category + rng.randint(1,n_classes)) % n_classes
 
-        pairs[1][i,:,:,:] = X[category_2,idx_2].reshape(h, w,1)
+        pairs[1][i,:,:,:] = X[category_2,idx_2].reshape(w, h,1)
 
     return pairs, targets
 
@@ -217,7 +218,7 @@ def make_oneshot_task(N, s="val", language=None):
     else:
         X = Xval
         categories = val_classes
-    n_classes, n_examples, w, h = X.shape
+    n_classes, n_examples, h, w = X.shape
 
     indices = rng.randint(0, n_examples,size=(N,))
     if language is not None: # if language is specified, select characters for that language
@@ -230,10 +231,10 @@ def make_oneshot_task(N, s="val", language=None):
         categories = rng.choice(range(n_classes),size=(N,),replace=False)
     true_category = categories[0]
     ex1, ex2 = rng.choice(n_examples,replace=False,size=(2,))
-    test_image = np.asarray([X[true_category,ex1,:,:]]*N).reshape(N, h,w,1)
+    test_image = np.asarray([X[true_category,ex1,:,:]]*N).reshape(N, w, h,1)
     support_set = X[categories,indices,:,:]
     support_set[0,:,:] = X[true_category,ex2]
-    support_set = support_set.reshape(N, h, w,1)
+    support_set = support_set.reshape(N, w, h,1)
     targets = np.zeros((N,))
     targets[0] = 1
     targets, test_image, support_set = shuffle(targets, test_image, support_set)
@@ -302,8 +303,8 @@ if __name__ == '__main__':
     with open(os.path.join(dataset_dir, "val.pickle"), "rb") as f:
         (Xval, val_classes) = pickle.load(f)
 
-    evaluate_every = 7500 # interval for evaluating on one-shot tasks
-    n_iter = 75000 # No. of training iterations
+    evaluate_every = 150 # interval for evaluating on one-shot tasks
+    n_iter = 7500 # No. of training iterations
     N_way = 18 # how many classes for testing one-shot tasks
     n_val = 100 # how many one-shot tasks to validate on
     best = -1
