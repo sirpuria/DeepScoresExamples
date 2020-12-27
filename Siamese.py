@@ -129,6 +129,9 @@ def get_siamese_model(input_shape):
     initialize_bias = tf.keras.initializers.RandomNormal(mean=0.5, stddev=0.01)
     # Convolutional Neural Network
     model = Sequential([
+    Conv2D(32, (10,10), activation='relu', input_shape=input_shape,
+                   kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
+    MaxPool2D(),
     Conv2D(64, (10,10), activation='relu', input_shape=input_shape,
                    kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
     MaxPool2D(),
@@ -140,6 +143,9 @@ def get_siamese_model(input_shape):
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
     MaxPool2D(),
     Conv2D(256, (4,4), activation='relu', kernel_initializer=initialize_weights,
+                     bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
+    MaxPool2D(),
+    Conv2D(512, (4,4), activation='relu', kernel_initializer=initialize_weights,
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
     Flatten(),
     Dense(4096, activation='sigmoid',
@@ -303,7 +309,7 @@ if __name__ == '__main__':
     with open(os.path.join(dataset_dir, "val.pickle"), "rb") as f:
         (Xval, val_classes) = pickle.load(f)
 
-    evaluate_every = 150 # interval for evaluating on one-shot tasks
+    evaluate_every = 500 # interval for evaluating on one-shot tasks
     n_iter = 7500 # No. of training iterations
     N_way = 18 # how many classes for testing one-shot tasks
     n_val = 100 # how many one-shot tasks to validate on
