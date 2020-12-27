@@ -255,7 +255,7 @@ if __name__ == '__main__':
     validation_dir = os.path.join(dataset_dir, 'eval')
     test_dir = os.path.join(dataset_dir, 'test')
     # classes= os.listdir(train_dir)
-    model = get_siamese_model((120, 220, 1))
+    model = get_siamese_model((220, 120, 1))
     model.summary()
     optimizer = Adam(learning_rate=0.00006)
     model.compile(loss="binary_crossentropy",optimizer=optimizer)
