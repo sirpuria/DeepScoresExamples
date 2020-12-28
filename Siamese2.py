@@ -11,7 +11,7 @@ import pickle
 import time
 
 from tensorflow.keras.models import Sequential, Model
-from tensorflow.keras.layers import Conv2D, MaxPool2D, Dropout, Flatten, Dense, Input, Lambda
+from tensorflow.keras.layers import Conv2D, MaxPool2D, Dropout, Flatten, Dense, Input, Lambda,BatchNormalization, ReLU
 from tensorflow.keras.losses import CategoricalCrossentropy
 from tensorflow.keras.metrics import Accuracy
 from tensorflow.keras.optimizers import Adam
@@ -100,18 +100,26 @@ def get_siamese_model(input_shape):
     initialize_bias = tf.keras.initializers.RandomNormal(mean=0.5, stddev=0.01)
     # Convolutional Neural Network
     model = Sequential([
-    Conv2D(64, (3,3), activation='relu', input_shape=input_shape,
+    Conv2D(128, (3,3), input_shape=input_shape,
                    kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
+    BatchNormalization(),
+    ReLU(),
     MaxPool2D(),
-    Conv2D(128, (3,3), activation='relu',
+    Conv2D(128, (3,3), 
                      kernel_initializer=initialize_weights,
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
+    BatchNormalization(),
+    ReLU(),
     MaxPool2D(),
-    Conv2D(128, (3,3), activation='relu', kernel_initializer=initialize_weights,
+    Conv2D(128, (3,3), kernel_initializer=initialize_weights,
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
+    BatchNormalization(),
+    ReLU(),
     MaxPool2D(),
-    Conv2D(256, (3,3), activation='relu', kernel_initializer=initialize_weights,
+    Conv2D(256, (3,3),  kernel_initializer=initialize_weights,
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
+    BatchNormalization(),
+    ReLU(),
     Flatten(),
     Dense(4096, activation='sigmoid',
                    kernel_regularizer=l2(1e-3),
