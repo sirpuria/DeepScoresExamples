@@ -288,7 +288,7 @@ if __name__ == '__main__':
     with open(os.path.join(dataset_dir, "val.pickle"), "rb") as f:
         (Xval, val_classes) = pickle.load(f)
 
-    evaluate_every = 100 # interval for evaluating on one-shot tasks
+    evaluate_every = 500 # interval for evaluating on one-shot tasks
     n_iter = 7500 # No. of training iterations
     N_way = 18 # how many classes for testing one-shot tasks
     n_val = 100 # how many one-shot tasks to validate on
