@@ -100,7 +100,7 @@ def get_siamese_model(input_shape):
     initialize_bias = tf.keras.initializers.RandomNormal(mean=0.5, stddev=0.01)
     # Convolutional Neural Network
     model = Sequential([
-    Conv2D(64, (3,), activation='relu', input_shape=input_shape,
+    Conv2D(64, (3,3), activation='relu', input_shape=input_shape,
                    kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
     MaxPool2D(),
     Conv2D(128, (3,3), activation='relu',
