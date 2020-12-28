@@ -304,8 +304,6 @@ if __name__ == '__main__':
     for i in range(1, n_iter+1):
         (inputs,targets) = get_batch(batch_size)
         loss = model.train_on_batch(inputs, targets)
-        if i%2==0:
-            print ("i{0} {1}".format(i, loss))
         if i % evaluate_every == 0:
             print("\n ------------- \n")
             print("Time for {0} iterations: {1} mins".format(i, (time.time()-t_start)/60.0))
