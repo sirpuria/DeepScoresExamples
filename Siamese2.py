@@ -124,13 +124,9 @@ def get_siamese_model(input_shape):
     BatchNormalization(),
     ReLU(),
     MaxPool2D(pool_size=(3,3)),
-    Conv2D(512, (7,7),  kernel_initializer=initialize_weights,
-                     bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
-    BatchNormalization(),
-    ReLU(),
-    MaxPool2D(pool_size=(5,5)),
     Flatten(),
-    Dense(36864, activation='sigmoid',
+
+    Dense(4096, activation='sigmoid',
                    kernel_regularizer=l2(1e-3),
                    kernel_initializer=initialize_weights,bias_initializer=initialize_bias)
 
