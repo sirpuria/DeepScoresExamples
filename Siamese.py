@@ -47,7 +47,7 @@ def loadimgs(path,n = 0):
             letter_path = os.path.join(alphabet_path, letter)
             # read all the images in the current category
             dirlist = os.listdir(letter_path)
-            if len(dirlist)==100:
+            if len(dirlist)==nperclass:
                 for filename in dirlist:
                     image_path = os.path.join(letter_path, filename)
                     image = imageio.imread(image_path)
@@ -243,12 +243,13 @@ if __name__ == '__main__':
                       default=128)
     parser.add_argument('--epochs', type=int,
                     default=50)
-    parser.add_argument('-mode', default='train', type=str)
+    parser.add_argument('-n', default=100, type=int)
 
     FLAGS, unparsed = parser.parse_known_args()
 
     dataset_dir = FLAGS.data_dir
     batch_size=FLAGS.batch_size
+    nperclass = FLAGS.n
     # epochs=FLAGS.epochs
     # mode=FLAGS.mode
     train_dir = os.path.join(dataset_dir, 'train')
