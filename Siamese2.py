@@ -100,36 +100,62 @@ def get_siamese_model(input_shape):
     initialize_bias = tf.keras.initializers.RandomNormal(mean=0.5, stddev=0.01)
     # Convolutional Neural Network
     model = Sequential([
-    Conv2D(128, (2,2), input_shape=input_shape,
+    Conv2D(64, (10,10),  input_shape=input_shape,
                    kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
     BatchNormalization(),
     ReLU(),
-    Conv2D(64, (2,2), input_shape=input_shape,
-                   kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
-    BatchNormalization(),
-    ReLU(),
-    Conv2D(128, (2,2), input_shape=input_shape,
-                   kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
-    BatchNormalization(),
-    ReLU(),
-
-    Conv2D(128, (5,5),
+    MaxPool2D(),
+    Conv2D(128, (7,7),
                      kernel_initializer=initialize_weights,
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
     BatchNormalization(),
     ReLU(),
-    MaxPool2D(pool_size=(3,3)),
-    Conv2D(256, (5,5), kernel_initializer=initialize_weights,
+    MaxPool2D(),
+    Conv2D(128, (4,4),  kernel_initializer=initialize_weights,
+                     bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
+    BatchNormalization(),
+    ReLU(),
+    MaxPool2D(),
+    Conv2D(256, (4,4),  kernel_initializer=initialize_weights,
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
     ReLU(),
-    MaxPool2D(pool_size=(5,5)),
     Flatten(),
-
-    Dense(2048, activation='sigmoid',
+    Dense(4096, activation='sigmoid',
                    kernel_regularizer=l2(1e-3),
                    kernel_initializer=initialize_weights,bias_initializer=initialize_bias)
 
                    ])
+    # model = Sequential([
+    # Conv2D(128, (2,2), input_shape=input_shape,
+    #                kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
+    # BatchNormalization(),
+    # ReLU(),
+    # Conv2D(64, (2,2), input_shape=input_shape,
+    #                kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
+    # BatchNormalization(),
+    # ReLU(),
+    # Conv2D(128, (2,2), input_shape=input_shape,
+    #                kernel_initializer=initialize_weights, kernel_regularizer=l2(2e-4)),
+    # BatchNormalization(),
+    # ReLU(),
+    #
+    # Conv2D(128, (5,5),
+    #                  kernel_initializer=initialize_weights,
+    #                  bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
+    # BatchNormalization(),
+    # ReLU(),
+    # MaxPool2D(pool_size=(3,3)),
+    # Conv2D(256, (5,5), kernel_initializer=initialize_weights,
+    #                  bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
+    # ReLU(),
+    # MaxPool2D(pool_size=(5,5)),
+    # Flatten(),
+    #
+    # Dense(2048, activation='sigmoid',
+    #                kernel_regularizer=l2(1e-3),
+    #                kernel_initializer=initialize_weights,bias_initializer=initialize_bias)
+    #
+    #                ])
     # Generate the encodings (feature vectors) for the two images
     encoded_l = model(left_input)
     encoded_r = model(right_input)
