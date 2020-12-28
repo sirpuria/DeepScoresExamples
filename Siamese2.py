@@ -274,7 +274,8 @@ if __name__ == '__main__':
     # classes= os.listdir(train_dir)
     model = get_siamese_model((220, 120, 1))
     model.summary()
-    optimizer = Adam(learning_rate=0.00006)
+    optimizer = Adam(learning_rate=0.001)
+    # optimizer = Adam(learning_rate=0.00006)
     model.compile(loss="binary_crossentropy",optimizer=optimizer)
     X,y,c = loadimgs(train_dir)
     with open(os.path.join(dataset_dir,"train.pickle"), "wb") as f:
