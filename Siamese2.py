@@ -121,13 +121,8 @@ def get_siamese_model(input_shape):
 
     Conv2D(256, (5,5), kernel_initializer=initialize_weights,
                      bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
-    BatchNormalization(),
     ReLU(),
-    MaxPool2D(pool_size=(3,3)),
-    Conv2D(512, (7,7),  kernel_initializer=initialize_weights,
-                     bias_initializer=initialize_bias, kernel_regularizer=l2(2e-4)),
-    ReLU(),
-    MaxPool2D(pool_size=(5,5)),
+
     Flatten(),
 
     Dense(2048, activation='sigmoid',
@@ -274,8 +269,8 @@ if __name__ == '__main__':
     # classes= os.listdir(train_dir)
     model = get_siamese_model((220, 120, 1))
     model.summary()
-    optimizer = Adam(learning_rate=0.001)
-    # optimizer = Adam(learning_rate=0.00006)
+    # optimizer = Adam(learning_rate=0.001)
+    optimizer = Adam(learning_rate=0.00006)
     model.compile(loss="binary_crossentropy",optimizer=optimizer)
     X,y,c = loadimgs(train_dir)
     with open(os.path.join(dataset_dir,"train.pickle"), "wb") as f:
