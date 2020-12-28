@@ -57,11 +57,11 @@ def main(FLAGS):
 
     image_generator = ImageDataGenerator(rescale=1/255.)
     train_gn = image_generator.flow_from_directory(directory=train_dir, batch_size=batch_size, shuffle=True,
-                    target_size=(120, 220), classes=classes)
+                    target_size=(220, 120), classes=classes)
     validation_gn = image_generator.flow_from_directory(directory=validation_dir, batch_size=batch_size, shuffle=True,
-                    target_size=(120, 220), classes=classes)
+                    target_size=(220, 120), classes=classes)
     test_gn = image_generator.flow_from_directory(directory=test_dir, batch_size=batch_size, shuffle=True,
-                    target_size=(120, 220), classes=classes)
+                    target_size=(220, 120), classes=classes)
 
 
     model = create_deepscores_cnn_model((220, 120, 3), len(classes))
