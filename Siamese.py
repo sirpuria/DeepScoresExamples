@@ -253,6 +253,8 @@ if __name__ == '__main__':
                       default=128)
     parser.add_argument('--epochs', type=int,
                     default=50)
+    parser.add_argument('--steps', type=int,
+                    default=1000)
     parser.add_argument('-n', default=100, type=int)
 
     FLAGS, unparsed = parser.parse_known_args()
@@ -261,6 +263,7 @@ if __name__ == '__main__':
     batch_size=FLAGS.batch_size
     nperclass = 100
     epochs=FLAGS.epochs
+    steps = FLAGS.steps
     # mode=FLAGS.mode
     train_dir = os.path.join(dataset_dir, 'train')
     validation_dir = os.path.join(dataset_dir, 'validate')
@@ -332,7 +335,7 @@ if __name__ == '__main__':
 
 
 
-    history = model.fit(generate(batch_size, "train"), steps_per_epoch=1500, epochs=epochs, callbacks=[CustomCallback()])
+    history = model.fit(generate(batch_size, "train"), steps_per_epoch=steps, epochs=epochs, callbacks=[CustomCallback()])
     print(history)
 
 
