@@ -332,7 +332,7 @@ if __name__ == '__main__':
             print(test1_acc)
             test2_acc = test_oneshot(model, n2, n_val, s="test2", verbose=True)
             print(test2_acc)
-
+            model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(i)))
 
 
     history = model.fit(generate(batch_size, "train"), steps_per_epoch=steps, epochs=epochs, callbacks=[CustomCallback()])
