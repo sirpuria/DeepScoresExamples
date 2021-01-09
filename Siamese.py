@@ -18,6 +18,7 @@ from tensorflow.keras.optimizers import Adam
 from tensorflow.keras import regularizers
 from tensorflow.keras.regularizers import l2
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.callbacks import Callback
 from sklearn.utils import shuffle
 
 import numpy as  np
@@ -47,7 +48,7 @@ def loadimgs(path,n = 0):
             letter_path = os.path.join(alphabet_path, letter)
             # read all the images in the current category
             dirlist = os.listdir(letter_path)
-            if len(dirlist)==nperclass:
+            if len(dirlist)>1:
                 for filename in dirlist:
                     image_path = os.path.join(letter_path, filename)
                     image = imageio.imread(image_path)
@@ -186,9 +187,16 @@ def make_oneshot_task(N, s="val", language=None):
     if s == 'train':
         X = Xtrain
         categories = train_classes
-    else:
+    elif s == 'val':
         X = Xval
         categories = val_classes
+    elif s == 'test1':
+        X = Xtest
+        categories = test_classes
+
+    else :
+        X = Xtest2
+        categories = test2_classes
     n_classes, n_examples,h, w = X.shape
 
     indices = rng.randint(0, n_examples,size=(N,))
@@ -219,12 +227,14 @@ def test_oneshot(model, N, k, s = "val", verbose = 0):
     """Test average N way oneshot learning accuracy of a siamese neural net over k one-shot tasks"""
     n_correct = 0
     if verbose:
-        print("Evaluating model on {} random {} way one-shot learning tasks ... \n".format(k,N))
+        print("Evaluating model on {} random {} way one-shot learning tasks from {} ... \n".format(k,N, s))
     for i in range(k):
         inputs, targets = make_oneshot_task(N,s)
         probs = model.predict(inputs)
         if np.argmax(probs) == np.argmax(targets):
             n_correct+=1
+        else:
+            print(targets[np.argmax(targets)])
     percent_correct = (100.0 * n_correct / k)
     if verbose:
         print("Got an average of {}% {} way one-shot learning accuracy \n".format(percent_correct,N))
@@ -249,12 +259,13 @@ if __name__ == '__main__':
 
     dataset_dir = FLAGS.data_dir
     batch_size=FLAGS.batch_size
-    nperclass = FLAGS.n
+    nperclass = 100
     # epochs=FLAGS.epochs
     # mode=FLAGS.mode
     train_dir = os.path.join(dataset_dir, 'train')
-    validation_dir = os.path.join(dataset_dir, 'eval')
+    validation_dir = os.path.join(dataset_dir, 'validate')
     test_dir = os.path.join(dataset_dir, 'test')
+    intrain_test_dir = os.path.join(dataset_dir, 'test2')
     # classes= os.listdir(train_dir)
     model = get_siamese_model((220, 120, 1))
     model.summary()
@@ -269,6 +280,15 @@ if __name__ == '__main__':
     with open(os.path.join(dataset_dir,"val.pickle"), "wb") as f:
         pickle.dump((Xval,cval),f)
 
+    Xtest,ytest,ctest=loadimgs(test_dir)
+    with open(os.path.join(dataset_dir,"test.pickle"), "wb") as f:
+        pickle.dump((Xtest,ctest),f)
+
+    Xtest2,ytest2,ctest2=loadimgs(intrain_test_dir)
+    with open(os.path.join(dataset_dir,"test2.pickle"), "wb") as f:
+        pickle.dump((Xtest2,ctest2),f)
+
+
 
     with open(os.path.join(dataset_dir, "train.pickle"), "rb") as f:
         (Xtrain, train_classes) = pickle.load(f)
@@ -276,28 +296,55 @@ if __name__ == '__main__':
     with open(os.path.join(dataset_dir, "val.pickle"), "rb") as f:
         (Xval, val_classes) = pickle.load(f)
 
-    evaluate_every = 500 # interval for evaluating on one-shot tasks
+    with open(os.path.join(dataset_dir, "test.pickle"), "rb") as f:
+        (Xtest, test_classes) = pickle.load(f)
+
+    with open(os.path.join(dataset_dir, "test2.pickle"), "rb") as f:
+        (Xtest2, test2_classes) = pickle.load(f)
+
+    evaluate_every = 1 # interval for evaluating on one-shot tasks
     n_iter = 7500 # No. of training iterations
     N_way = 18 # how many classes for testing one-shot tasks
-    n_val = 100 # how many one-shot tasks to validate on
+    n_val = 2 # how many one-shot tasks to validate on
     best = -1
 
     print("Starting training process!")
     print("-------------------------------------")
     t_start = time.time()
 
-    # history = model.fit(generate(4, "train"), steps_per_epoch=10, epochs=1, validation_data=generate(4, "validate"))
-    # print(history)
 
-    for i in range(1, n_iter+1):
-        (inputs,targets) = get_batch(batch_size)
-        loss = model.train_on_batch(inputs, targets)
-        if i % evaluate_every == 0:
-            print("\n ------------- \n")
-            print("Time for {0} iterations: {1} mins".format(i, (time.time()-t_start)/60.0))
-            print("Train Loss: {0}".format(loss))
-            val_acc = test_oneshot(model, N_way, n_val, verbose=True)
-            model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(i)))
-            if val_acc >= best:
-                print("Current best: {0}, previous best: {1}".format(val_acc, best))
-                best = val_acc
+    class CustomCallback(Callback):
+        def on_epoch_end(self, epoch, logs=None):
+            n1 = val_classes['musical'][1]+1
+            keys = list(logs.keys())
+            print("End epoch {} of training; got log keys: {}".format(epoch, keys))
+            val_acc = test_oneshot(model, n1, n_val, verbose=True)
+            print(val_acc)
+
+        def on_train_end(self, epoch, logs=None):
+            n1 = test_classes['musical'][1]+1
+            n2 = test2_classes['musical'][1]+1
+
+            test1_acc = test_oneshot(model, n1, n_val, s="test1", verbose=True)
+            print(test1_acc)
+            test2_acc = test_oneshot(model, n2, n_val, s="test2", verbose=True)
+            print(test2_acc)
+
+
+
+    history = model.fit(generate(4, "train"), steps_per_epoch=10, epochs=2, callbacks=[CustomCallback()])
+    print(history)
+
+
+    # for i in range(1, n_iter+1):
+    #     (inputs,targets) = get_batch(batch_size)
+    #     loss = model.train_on_batch(inputs, targets)
+    #     if i % evaluate_every == 0:
+    #         print("\n ------------- \n")
+    #         print("Time for {0} iterations: {1} mins".format(i, (time.time()-t_start)/60.0))
+    #         print("Train Loss: {0}".format(loss))
+    #         val_acc = test_oneshot(model, N_way, n_val, verbose=True)
+    #         model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(i)))
+    #         if val_acc >= best:
+    #             print("Current best: {0}, previous best: {1}".format(val_acc, best))
+    #             best = val_acc
