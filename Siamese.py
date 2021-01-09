@@ -233,8 +233,8 @@ def test_oneshot(model, N, k, s = "val", verbose = 0):
         probs = model.predict(inputs)
         if np.argmax(probs) == np.argmax(targets):
             n_correct+=1
-        else:
-            print(targets[np.argmax(targets)])
+        # else:
+        #     print(targets[np.argmax(targets)])
     percent_correct = (100.0 * n_correct / k)
     if verbose:
         print("Got an average of {}% {} way one-shot learning accuracy \n".format(percent_correct,N))
@@ -260,7 +260,7 @@ if __name__ == '__main__':
     dataset_dir = FLAGS.data_dir
     batch_size=FLAGS.batch_size
     nperclass = 100
-    # epochs=FLAGS.epochs
+    epochs=FLAGS.epochs
     # mode=FLAGS.mode
     train_dir = os.path.join(dataset_dir, 'train')
     validation_dir = os.path.join(dataset_dir, 'validate')
@@ -305,7 +305,7 @@ if __name__ == '__main__':
     evaluate_every = 1 # interval for evaluating on one-shot tasks
     n_iter = 7500 # No. of training iterations
     N_way = 18 # how many classes for testing one-shot tasks
-    n_val = 2 # how many one-shot tasks to validate on
+    n_val = 200 # how many one-shot tasks to validate on
     best = -1
 
     print("Starting training process!")
@@ -332,7 +332,7 @@ if __name__ == '__main__':
 
 
 
-    history = model.fit(generate(4, "train"), steps_per_epoch=10, epochs=2, callbacks=[CustomCallback()])
+    history = model.fit(generate(batch_size, "train"), steps_per_epoch=1500, epochs=epochs, callbacks=[CustomCallback()])
     print(history)
 
 
