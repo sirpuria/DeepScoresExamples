@@ -455,7 +455,7 @@ if __name__ == '__main__':
     # print(history)
 
     for i in range(1, 32000):
-        triplets = get_batch_hard(batch_size, 4,4, network )
+        triplets = get_batch_hard(batch_size, 1,1, network )
         #print(triplets[0].shape)
         loss = network_train.train_on_batch(triplets, None)
         if i%100==0:
