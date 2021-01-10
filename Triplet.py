@@ -374,7 +374,7 @@ def test_oneshot(model, N, k, s = "val", verbose = 0):
 
         for i in range(N):
             par[i] = -compute_dist(probs[i], probs_test[i])
-            print(par[i])
+            #print(par[i])
 
         if np.argmax(par) == np.argmax(targets):
             n_correct+=1
