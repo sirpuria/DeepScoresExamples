@@ -105,13 +105,13 @@ def build_network(input_shape, embeddingsize):
                      input_shape=input_shape,
                      kernel_initializer='he_uniform',
                      kernel_regularizer=l2(2e-4)),
-    MaxPool2D(),
+    MaxPool2D( pool_size=(3,3)),
     Conv2D(128, (3,3), activation='relu', kernel_initializer='he_uniform',
                      kernel_regularizer=l2(2e-4)),
-    MaxPool2D(),
+    MaxPool2D(pool_size=(3,3)),
     Conv2D(256, (3,3), activation='relu', kernel_initializer='he_uniform',
                      kernel_regularizer=l2(2e-4)),
-                     MaxPool2D(),
+    MaxPool2D(pool_size=(3,3)),
     Flatten(),
     Dense(4096, activation='relu',
                    kernel_regularizer=l2(1e-3),
@@ -245,7 +245,7 @@ def get_batch_hard(draw_batch_size,hard_batchs_size,norm_batchs_size,network,s="
 
     #Step 2 : compute the loss with current network : d(A,P)-d(A,N). The alpha parameter here is omited here since we want only to order them
     studybatchloss = np.zeros((draw_batch_size))
-    print(studybatch[0].shape)
+    #print(studybatch[0].shape)
     #Compute embeddings for anchors, positive and negatives
     A = network.predict(studybatch[0])
     P = network.predict(studybatch[1])
