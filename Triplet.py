@@ -373,15 +373,14 @@ def test_oneshot(model, N, k, s = "val", verbose = 0):
         par = np.zeros(N)
 
         for i in range(N):
-            par[i] = -compute_dist(probs[i], probs_test[i])
+            par[i] = compute_dist(probs[i], probs_test[i])
             #print(par[i])
 
-        if np.argmax(par) == np.argmax(targets):
+        if np.min(par) == np.min(targets):
             n_correct+=1
-            print("T got index {} and  answer is {}".format(np.argmax(par),np.argmax(targets) ))
+            #print("T got index {} and  answer is {}".format(np.argmax(par),np.argmax(targets) ))
 
-        else:
-            print("F got index {} while answer is {}".format(np.argmax(par),np.argmax(targets) ))
+        # got index {} while answer is {}".format(np.argmax(par),np.argmax(targets) ))
     percent_correct = (100.0 * n_correct / k)
     if verbose:
         print("Got an average of {}% {} way one-shot learning accuracy \n".format(percent_correct,N))
