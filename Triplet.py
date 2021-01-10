@@ -376,7 +376,7 @@ def test_oneshot(model, N, k, s = "val", verbose = 0):
             par[i] = compute_dist(probs[i], probs_test[i])
             #print(par[i])
 
-        if np.min(par) == np.min(targets):
+        if np.argmin(par) == np.argmin(targets):
             n_correct+=1
             #print("T got index {} and  answer is {}".format(np.argmax(par),np.argmax(targets) ))
 
