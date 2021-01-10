@@ -399,13 +399,15 @@ if __name__ == '__main__':
                       default=128)
     parser.add_argument('--epochs', type=int,
                     default=50)
-    parser.add_argument('-n', default=100, type=int)
+    parser.add_argument('--hard', default=2, type=int)
+    parser.add_argument('--normal', default=2, type=int)
 
     FLAGS, unparsed = parser.parse_known_args()
 
     dataset_dir = FLAGS.data_dir
     batch_size=FLAGS.batch_size
-    nperclass = FLAGS.n
+    hard_n = FLAGS.hard
+    normal_n = FLAGS.normal
     # epochs=FLAGS.epochs
     # mode=FLAGS.mode
     train_dir = os.path.join(dataset_dir, 'train')
@@ -454,7 +456,7 @@ if __name__ == '__main__':
     # print(history)
 
     for i in range(1, 32000):
-        triplets = get_batch_hard(batch_size, 1,1, network )
+        triplets = get_batch_hard(batch_size, hard_n,normal_n, network )
         #print(triplets[0].shape)
         loss = network_train.train_on_batch(triplets, None)
         if i%100==0:
