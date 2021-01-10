@@ -455,9 +455,11 @@ if __name__ == '__main__':
     # print(history)
 
     for i in range(1, 32000):
-        triplets = get_batch_hard(32, 8,8, network )
+        triplets = get_batch_hard(16, 4,4, network )
         #print(triplets[0].shape)
         loss = network_train.train_on_batch(triplets, None)
+        if i%100==0:
+            print("Loss is {}".format(loss))
         if i%500 == 0:
 
             a = test_oneshot(network, 18, 100, verbose=True)
