@@ -221,6 +221,7 @@ def make_oneshot_task(N, s="val", language=None):
     support_set = support_set.reshape(N2, h, w,1)
     targets = np.zeros((N2,))
     targets[0] = 1
+    target[1] = 1
     targets, test_image, support_set = shuffle(targets, test_image, support_set)
     pairs = [test_image,support_set]
 
