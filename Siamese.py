@@ -201,8 +201,7 @@ def make_oneshot_task(N, s="val", language=None):
         categories = test2_classes
     n_classes, n_examples,h, w = X.shape
 
-    N2 = N*2
-    indices = rng.randint(0, n_examples,size=(N2,))
+    indices = rng.randint(0, n_examples,size=(N,))
     if language is not None: # if language is specified, select characters for that language
         low, high = categories[language]
         if N > high - low:
@@ -213,11 +212,11 @@ def make_oneshot_task(N, s="val", language=None):
         categories = rng.choice(range(n_classes),size=(N,),replace=False)
     true_category = categories[0]
     ex1, ex2 = rng.choice(n_examples,replace=False,size=(2,))
-    test_image = np.asarray([X[true_category,ex1,:,:]]*N2).reshape(N2, h,w,1)
+    test_image = np.asarray([X[true_category,ex1,:,:]]*N).reshape(N, h,w,1)
     support_set = X[categories,indices,:,:]
     support_set[0,:,:] = X[true_category,ex2]
-    support_set = support_set.reshape(N2, h, w,1)
-    targets = np.zeros((N2,))
+    support_set = support_set.reshape(N, h, w,1)
+    targets = np.zeros((N,))
     targets[0] = 1
     targets, test_image, support_set = shuffle(targets, test_image, support_set)
     pairs = [test_image,support_set]
