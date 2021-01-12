@@ -319,14 +319,18 @@ if __name__ == '__main__':
 
 
     class CustomCallback(Callback):
+        def __init__(self ):
+            super(CustomCallback, self).__init__()
+            self.best = -1
+
         def on_epoch_end(self, epoch, logs=None):
             n1 = val_classes['musical'][1]+1
             keys = list(logs.keys())
             print("End epoch {} of training; got log keys: {}".format(epoch, keys))
             val_acc = test_oneshot(model, n1, n_val, verbose=True)
             print("Accuracy for validation epoch {} is: {}".format(epoch, val_acc))
-            if val_acc>=best:
-                best = val_acc
+            if val_acc>=self.best:
+                self.best = val_acc
                 model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(epoch)))
                 nt1 = test_classes['musical'][1]+1
                 nt2 = test2_classes['musical'][1]+1
