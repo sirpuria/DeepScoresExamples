@@ -327,7 +327,7 @@ if __name__ == '__main__':
             if val_acc>=best:
                 best = val_acc
                 model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(epoch)))
-            print(val_acc)
+            print("Accuracy for epoch {} is: {}".format(epoch, val_acc))
 
         def on_train_end(self, epoch, logs=None):
             n1 = test_classes['musical'][1]+1
