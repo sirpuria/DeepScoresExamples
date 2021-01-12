@@ -192,9 +192,6 @@ def make_oneshot_task(N, s="val", language=None):
     elif s == 'val':
         X = Xval
         categories = val_classes
-    elif s == 'test1':
-        X = Xtest
-        categories = test_classes
 
     else :
         X = Xtest2
@@ -269,7 +266,6 @@ if __name__ == '__main__':
     # mode=FLAGS.mode
     train_dir = os.path.join(dataset_dir, 'train')
     validation_dir = os.path.join(dataset_dir, 'validate')
-    test_dir = os.path.join(dataset_dir, 'test')
     intrain_test_dir = os.path.join(dataset_dir, 'test2')
     # classes= os.listdir(train_dir)
     model = get_siamese_model((220, 120, 1))
@@ -285,9 +281,7 @@ if __name__ == '__main__':
     with open(os.path.join(dataset_dir,"val.pickle"), "wb") as f:
         pickle.dump((Xval,cval),f)
 
-    Xtest,ytest,ctest=loadimgs(test_dir)
-    with open(os.path.join(dataset_dir,"test.pickle"), "wb") as f:
-        pickle.dump((Xtest,ctest),f)
+
 
     Xtest2,ytest2,ctest2=loadimgs(intrain_test_dir)
     with open(os.path.join(dataset_dir,"test2.pickle"), "wb") as f:
@@ -301,8 +295,7 @@ if __name__ == '__main__':
     with open(os.path.join(dataset_dir, "val.pickle"), "rb") as f:
         (Xval, val_classes) = pickle.load(f)
 
-    with open(os.path.join(dataset_dir, "test.pickle"), "rb") as f:
-        (Xtest, test_classes) = pickle.load(f)
+
 
     with open(os.path.join(dataset_dir, "test2.pickle"), "rb") as f:
         (Xtest2, test2_classes) = pickle.load(f)
@@ -332,20 +325,18 @@ if __name__ == '__main__':
             if val_acc>=self.best:
                 self.best = val_acc
                 model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(epoch)))
-                nt1 = test_classes['musical'][1]+1
                 nt2 = test2_classes['musical'][1]+1
 
-                test1_acc = test_oneshot(model, nt1, n_val, s="test1", verbose=True)
-                print("Accuracy for Test 1  epoch {} is: {}".format(epoch, test1_acc))
+
                 test2_acc = test_oneshot(model, nt2, n_val, s="test2", verbose=True)
                 print("Accuracy for Test 2  epoch {} is: {}".format(epoch, test2_acc))
 
 
         def on_train_end(self, epoch, logs=None):
-            n1 = test_classes['musical'][1]+1
+            n1 = val_classes['musical'][1]+1
             n2 = test2_classes['musical'][1]+1
 
-            test1_acc = test_oneshot(model, n1, n_val, s="test1", verbose=True)
+            test1_acc = test_oneshot(model, n1, n_val, verbose=True)
             print(test1_acc)
             test2_acc = test_oneshot(model, n2, n_val, s="test2", verbose=True)
             print(test2_acc)
