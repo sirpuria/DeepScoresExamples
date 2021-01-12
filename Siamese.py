@@ -185,6 +185,7 @@ def generate(batch_size, s="train"):
         yield (pairs, targets)
 
 def make_oneshot_task(N, s="val", language=None):
+    N2=N*2
     """Create pairs of test image, support set for testing N way one-shot learning. """
     if s == 'train':
         X = Xtrain
@@ -201,7 +202,7 @@ def make_oneshot_task(N, s="val", language=None):
         categories = test2_classes
     n_classes, n_examples,h, w = X.shape
 
-    indices = rng.randint(0, n_examples,size=(N,))
+    indices = rng.randint(0, n_examples,size=(N2,))
     if language is not None: # if language is specified, select characters for that language
         low, high = categories[language]
         if N > high - low:
@@ -210,13 +211,15 @@ def make_oneshot_task(N, s="val", language=None):
 
     else: # if no language specified just pick a bunch of random letters
         categories = rng.choice(range(n_classes),size=(N,),replace=False)
+    categories = np.repeat(categories, 2)
+
     true_category = categories[0]
     ex1, ex2 = rng.choice(n_examples,replace=False,size=(2,))
-    test_image = np.asarray([X[true_category,ex1,:,:]]*N).reshape(N, h,w,1)
+    test_image = np.asarray([X[true_category,ex1,:,:]]*N2).reshape(N2, h,w,1)
     support_set = X[categories,indices,:,:]
     support_set[0,:,:] = X[true_category,ex2]
-    support_set = support_set.reshape(N, h, w,1)
-    targets = np.zeros((N,))
+    support_set = support_set.reshape(N2, h, w,1)
+    targets = np.zeros((N2,))
     targets[0] = 1
     targets, test_image, support_set = shuffle(targets, test_image, support_set)
     pairs = [test_image,support_set]
