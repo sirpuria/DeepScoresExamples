@@ -171,6 +171,8 @@ def get_batch(batch_size,s="train"):
             # add a random number to the category modulo n classes to ensure 2nd image has a different category
             category_2 = (category + rng.randint(1,n_classes)) % n_classes
 
+
+
         pairs[1][i,:,:,:] = X[category_2,idx_2].reshape(h, w,1)
 
     return pairs, targets
@@ -322,6 +324,9 @@ if __name__ == '__main__':
             keys = list(logs.keys())
             print("End epoch {} of training; got log keys: {}".format(epoch, keys))
             val_acc = test_oneshot(model, n1, n_val, verbose=True)
+            if val_acc>=best:
+                best = val_acc
+                model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(epoch)))
             print(val_acc)
 
         def on_train_end(self, epoch, logs=None):
