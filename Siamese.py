@@ -324,10 +324,18 @@ if __name__ == '__main__':
             keys = list(logs.keys())
             print("End epoch {} of training; got log keys: {}".format(epoch, keys))
             val_acc = test_oneshot(model, n1, n_val, verbose=True)
+            print("Accuracy for validation epoch {} is: {}".format(epoch, val_acc))
             if val_acc>=best:
                 best = val_acc
                 model.save_weights(os.path.join(dataset_dir, 'weights.{}.h5'.format(epoch)))
-            print("Accuracy for epoch {} is: {}".format(epoch, val_acc))
+                nt1 = test_classes['musical'][1]+1
+                nt2 = test2_classes['musical'][1]+1
+
+                test1_acc = test_oneshot(model, nt1, n_val, s="test1", verbose=True)
+                print("Accuracy for Test 1  epoch {} is: {}".format(epoch, test1_acc))
+                test2_acc = test_oneshot(model, nt2, n_val, s="test2", verbose=True)
+                print("Accuracy for Test 2  epoch {} is: {}".format(epoch, test2_acc))
+
 
         def on_train_end(self, epoch, logs=None):
             n1 = test_classes['musical'][1]+1
